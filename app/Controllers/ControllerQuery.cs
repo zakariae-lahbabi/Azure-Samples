@@ -25,7 +25,7 @@ namespace AzureSamples.AzureSQL.Controllers
         private readonly ILogger<ControllerQuery> _logger;
         private readonly IConfiguration _config;
         private readonly IScaleOut _scaleOut;
-        private readonly string _entityName = string.Empty ;
+        private readonly string _entityName = string.Empty;
 
         public ControllerQuery(IConfiguration config, ILogger<ControllerQuery> logger, IScaleOut scaleOut, string entityName)
         {
@@ -47,11 +47,12 @@ namespace AzureSamples.AzureSQL.Controllers
 
             string databaseName = string.Empty;
 
-            using(var conn = new SqlConnection(_scaleOut.GetConnectionString(connectionIntent, tag))) {
+            using (var conn = new SqlConnection(_scaleOut.GetConnectionString(connectionIntent, tag)))
+            {
                 databaseName = conn.Database;
 
                 DynamicParameters parameters = new DynamicParameters();
-                
+
                 if (payload.ValueKind != default(JsonValueKind))
                 {
                     var json = JsonSerializer.Serialize(payload);
@@ -62,21 +63,21 @@ namespace AzureSamples.AzureSQL.Controllers
                     parameters.Add("Id", id.Value);
 
                 var esr = await conn.ExecuteScalarAsync<string>(
-                    sql: procedure, 
-                    param: parameters, 
+                    sql: procedure,
+                    param: parameters,
                     commandType: CommandType.StoredProcedure
                 );
-                
+
                 if (esr != null)
                     result = JsonDocument.Parse(esr);
             };
 
-            if (result == null) 
+            if (result == null)
                 result = JsonDocument.Parse("[]");
-                        
+
             _logger.LogDebug($"Executed {procedure}, tag: {tag}, on: {databaseName}");
 
             return (result, databaseName);
-        }        
+        }
     }
 }

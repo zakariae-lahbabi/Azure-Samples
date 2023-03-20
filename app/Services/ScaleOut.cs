@@ -37,19 +37,19 @@ namespace AzureSamples.AzureSQL.Services
         public ScaleOut(IConfiguration config, ILogger<ScaleOut> logger)
         {
             _logger = logger;
-            _config = config;                       
+            _config = config;
         }
 
         public string GetConnectionString(ConnectionIntent connectionIntent, string tag = default(string))
         {
-            if (connectionIntent == ConnectionIntent.Write) 
+            if (connectionIntent == ConnectionIntent.Write)
                 return _config.GetConnectionString("AzureSQLConnection");
 
-            if (tag == default(string)) 
+            if (tag == default(string))
                 tag = "GenericRead";
 
             string result = string.Empty;
-            var elapsed = DateTime.Now - _lastCall;            
+            var elapsed = DateTime.Now - _lastCall;
 
             // Get the list of available named replica from the primary replica
             // Add some randomness to avoid the "thundering herd" problem
@@ -67,26 +67,26 @@ namespace AzureSamples.AzureSQL.Services
                         sql: "api.get_available_scale_out_replicas",
                         commandType: CommandType.StoredProcedure
                     ).AsList();
-                    
+
                     _replicaConnectionString = new Dictionary<string, List<string>>();
 
-                    foreach(var ri in replicaInfoList)
+                    foreach (var ri in replicaInfoList)
                     {
                         var csb = new SqlConnectionStringBuilder(connString);
                         if (!string.IsNullOrEmpty(ri.DatabaseName))
                             csb.InitialCatalog = ri.DatabaseName;
-                        
+
                         if (!_replicaConnectionString.ContainsKey(ri.Tag))
                             _replicaConnectionString.Add(ri.Tag, new List<string>());
 
-                        _replicaConnectionString[ri.Tag].Add(csb.ToString());                        
+                        _replicaConnectionString[ri.Tag].Add(csb.ToString());
                     }
 
                     _lastCall = DateTime.Now;
                     _logger.LogDebug($"Got {replicaInfoList.Count} replicas over {_replicaConnectionString.Count} tags.");
-                }            
+                }
             }
-                
+
             // Get the list of available connection strings based on requested tag
             List<string> connectionStringList = null;
             _replicaConnectionString.TryGetValue(tag, out connectionStringList);
@@ -94,16 +94,17 @@ namespace AzureSamples.AzureSQL.Services
             // Fall back to GenericRead tag if requested tag is not found
             if (connectionStringList == null)
                 _replicaConnectionString.TryGetValue("GenericRead", out connectionStringList);
-            
+
             // Get a connection string randomly
             if (connectionStringList != null && connectionStringList.Count > 0)
             {
                 var i = _rnd.Next(connectionStringList.Count);
                 result = connectionStringList[i];
             }
-            else {
+            else
+            {
                 result = _config.GetConnectionString("AzureSQLConnection");
-            }                          
+            }
 
             return result;
         }
