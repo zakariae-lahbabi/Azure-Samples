@@ -56,7 +56,7 @@ namespace AzureSamples.AzureSQL.Services
             // in case there are many concurrent instances of this web app running
             if (elapsed.TotalMilliseconds > _rnd.Next(3500, 5500))
             {
-                _logger.LogDebug($"Loading available replicas...");
+                _logger.LogDebug("Loading available replicas...");
 
                 var database = string.Empty;
                 var connString = _config.GetConnectionString("AzureSQLConnection");
