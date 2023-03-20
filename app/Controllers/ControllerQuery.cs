@@ -50,7 +50,7 @@ namespace AzureSamples.AzureSQL.Controllers
             using(var conn = new SqlConnection(_scaleOut.GetConnectionString(connectionIntent, tag))) {
                 databaseName = conn.Database;
 
-                DynamicParameters parameters = new DynamicParameters();
+                DynamicParameters parameters = new();
                 
                 if (payload.ValueKind != default(JsonValueKind))
                 {
