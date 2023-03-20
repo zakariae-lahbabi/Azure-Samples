@@ -14,12 +14,13 @@ namespace AzureSamples.AzureSQL.Controllers
     [Route("shopping_cart")]
     public class ShoppingCartController : ControllerQuery
     {
-        public ShoppingCartController(IConfiguration config, ILogger<ShoppingCartController> logger, IScaleOut scaleOut):
-            base(config, logger, scaleOut, "shopping_cart") {}
+        public ShoppingCartController(IConfiguration config, ILogger<ShoppingCartController> logger, IScaleOut scaleOut) :
+            base(config, logger, scaleOut, "shopping_cart")
+        { }
 
         [HttpGet("{id}")]
         public async Task<JsonDocument> Get(int id)
-        {            
+        {
             var (result, replica) = await this.Query(Verb.Get, id);
             HttpContext.Response.Headers.Add("Used-Replica-Name", replica);
             return result;
@@ -35,7 +36,7 @@ namespace AzureSamples.AzureSQL.Controllers
 
         [HttpGet("search/{term}")]
         public async Task<JsonDocument> SearchByTerm(String term)
-        {            
+        {
             var payload = JsonDocument.Parse(JsonSerializer.Serialize(new { term = "%" + term + "%" }));
 
             var (result, replica) = await this.Query(Verb.Get, payload: payload.RootElement, extension: "by_search", tag: "Search");
@@ -44,7 +45,7 @@ namespace AzureSamples.AzureSQL.Controllers
         }
 
         [HttpPut]
-        public async Task<JsonDocument> Put([FromBody]JsonElement payload)
+        public async Task<JsonDocument> Put([FromBody] JsonElement payload)
         {
             var (result, replica) = await this.Query(Verb.Put, payload: payload);
             HttpContext.Response.Headers.Add("Used-Replica-Name", replica);

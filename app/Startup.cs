@@ -43,7 +43,8 @@ namespace AzureSamples.AzureSQL
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Shopping Cart v1"));
-            } else 
+            }
+            else
             {
                 app.UseHttpsRedirection();
             }
