@@ -31,7 +31,7 @@ namespace AzureSamples.AzureSQL.Services
         private readonly IConfiguration _config;
         private readonly ILogger<ScaleOut> _logger;
         private DateTime _lastCall = DateTime.Now;
-        private Random _rnd = new Random();
+        private Random _rnd = new();
         private Dictionary<string, List<String>> _replicaConnectionString = new Dictionary<string, List<String>>();
 
         public ScaleOut(IConfiguration config, ILogger<ScaleOut> logger)
